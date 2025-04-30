@@ -13,10 +13,10 @@ void draw(char key);
 void enableRawMode(void);
 void disableRawMode(void);
 int input(void);
-char getch();
+char getch(void);
 
 int main(void) {
-    char key;
+    char key = ' ';
     enableRawMode();
     draw(key);
     while (1) {
@@ -44,6 +44,10 @@ int main(void) {
 }
 
 void draw(char key) {
+    fflush(stdout);
+    usleep(10000);
+    printf("\e[1;1H\e[2J");
+
     int bufferSize = (WIDTH * HEIGHT) + HEIGHT + 1;
     char*** table = malloc(WIDTH * sizeof(char**));
     if (table == NULL) {
@@ -60,8 +64,8 @@ void draw(char key) {
         for (int j = 0; j < HEIGHT; j++) {
             printf("%s", table[i][j]);
         }
-        if (i == 5) {
-            printf("        %c", key);
+        if (i == 5 && key != ' ') {
+            printf("        last key pressed = %c", key);
         }
         printf("\n");
     }
@@ -69,7 +73,7 @@ void draw(char key) {
     printf("\n");
     printf("score = %i\n", score);
     printf("Press W, A, S, D for movement.\n");
-    printf("Press X to quit the game.\n");
+    printf("Press Q to quit the game.\n");
 }
 
 int input(void) {
