@@ -104,13 +104,6 @@ void draw(char key) {
         }
     }
 
-    // make sure rn1 and r2 are not in the center at the start of the game
-    if (rn1 == WIDTH / 2 && rn2 == HEIGHT / 2 && isgame == 0) {
-        xrand();
-    }
-    // draw the flesh at a random location
-    table[rn1][rn2] = FLESH;
-
     // draw snake
     // if a key is pressed
     if (key != ' ') {
@@ -138,21 +131,28 @@ void draw(char key) {
             sloc2++;
         }
 
-        if (strcmp(table[sloc1][sloc2], FLESH) == 0) {
+        if (sloc1 == rn1 && sloc2 == rn2) {
             score++;
             // spawn flesh at a different location
-            table[rn1][rn2] = TEXTURE;
+            isflesh = 0;
             xrand();
-            table[rn1][rn2] = FLESH;
         }
+        table[rn1][rn2] = FLESH;
     }
-    // if the game just started, draw the snake in the middle
+    // if the game just started, draw the snake in the middle and spawn flesh
     if (!isgame) {
         table[HEIGHT / 2][WIDTH / 2] = SNAKE_HEAD;
 
         // set snake loc variable
         sloc1 = HEIGHT / 2;
         sloc2 = WIDTH / 2;
+
+        // make sure rn1 and r2 are not in the center at the start of the game
+        while (rn1 == WIDTH / 2 && rn2 == HEIGHT / 2) {
+            // draw the flesh at a random location
+            xrand();
+        }
+        table[rn1][rn2] = FLESH;
     }
 
     for (int i = 0; i < HEIGHT; i++) {
@@ -201,7 +201,7 @@ void disableRawMode(void) {
 
 // generate two numbers between 0 ~ 20
 void xrand(void) {
-    srand((unsigned long)time(NULL));
+    srand(time(NULL));
     if (isflesh == 0) {
         rn1 = rand() % 20;
         rn2 = rand() % 20;
