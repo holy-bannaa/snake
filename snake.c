@@ -29,6 +29,10 @@ int sloc2;
 
 // snake length
 int length = 0;
+// tail history
+int tail[HEIGHT * WIDTH][2];
+// growth prep
+int grow;
 
 // has the game been started
 int isgame = 0;
@@ -41,6 +45,7 @@ char getch(void);
 void xrand(void);
 
 int main(void) {
+    srand(time(NULL));
     char key = ' ';
     char kkey = ' ';
     enableRawMode();
@@ -65,7 +70,6 @@ int main(void) {
                     kkey = key;
                     break;
             }
-
         }
         if (kkey != ' ') {
             isgame = 1;
@@ -82,6 +86,7 @@ int main(void) {
                 case 'd':
                     move = 4;
             }
+            // game over screen
             if (draw(kkey) == 1) {
                 printf("game over\n");
                 printf("final score: %i\n", score);
@@ -99,7 +104,6 @@ int draw(char key) {
     printf("\e[1;1H\e[2J");
 
     // create 2d array of the table
-    int bufferSize = (HEIGHT * WIDTH) + WIDTH + 1;
     char*** table = malloc(HEIGHT * sizeof(char**));
     if (table == NULL) {
         return 2;
@@ -121,8 +125,39 @@ int draw(char key) {
                 return 1;
             }
 
+            // commit death if touching tail
+            for (int i = 0; i < length; i++) {
+                if (sloc1 - 1 == tail[i][0] && sloc2 == tail[i][1]) {
+                    return 1;
+                }
+            }
+
+            // draw head
             table[sloc1 - 1][sloc2] = SNAKE_HEAD;
-            table[sloc1][sloc2] = TEXTURE;
+            // draw tail
+            if (grow == 1) {
+                table[sloc1][sloc2] = SNAKE_BOD;
+                tail[length][0] = sloc1;
+                tail[length][1] = sloc2;
+                grow = 0;
+                length++;
+            } else if (length > 0) {
+                int tmp[4] = {sloc1, sloc2};
+                for (int i = 0; i < length; i++) {
+                    tmp[2] = tail[length - i][0];
+                    tmp[3] = tail[length - i][1];
+
+                    tail[length - i][0] = tmp[0];
+                    tail[length - i][1] = tmp[1];
+
+                    tmp[0] = tmp[2];
+                    tmp[1] = tmp[3];
+
+                    table[tail[length - i][0]][tail[length - i][1]] = SNAKE_BOD;
+                }
+            } else {
+                table[sloc1][sloc2] = TEXTURE;
+            }
             sloc1--;
         }
 
@@ -130,8 +165,39 @@ int draw(char key) {
             if (sloc2 - 1 < 0) {
                 return 1;
             }
+
+            // commit death if touching tail
+            for (int i = 0; i < length; i++) {
+                if (sloc1 == tail[i][0] && sloc2 - 1 == tail[i][1]) {
+                    return 1;
+                }
+            }
+
             table[sloc1][sloc2 - 1] = SNAKE_HEAD;
-            table[sloc1][sloc2] = TEXTURE;
+            // draw tail
+            if (grow == 1) {
+                table[sloc1][sloc2] = SNAKE_BOD;
+                tail[length][0] = sloc1;
+                tail[length][1] = sloc2;
+                grow = 0;
+                length++;
+            } else if (length > 0) {
+                int tmp[4] = {sloc1, sloc2};
+                for (int i = 0; i < length; i++) {
+                    tmp[2] = tail[length - i][0];
+                    tmp[3] = tail[length - i][1];
+
+                    tail[length - i][0] = tmp[0];
+                    tail[length - i][1] = tmp[1];
+
+                    tmp[0] = tmp[2];
+                    tmp[1] = tmp[3];
+
+                    table[tail[length - i][0]][tail[length - i][1]] = SNAKE_BOD;
+                }
+            } else {
+                table[sloc1][sloc2] = TEXTURE;
+            }
             sloc2--;
         }
 
@@ -139,8 +205,39 @@ int draw(char key) {
             if (sloc1 + 1 > HEIGHT - 1) {
                 return 1;
             }
+
+            // commit death if touching tail
+            for (int i = 0; i < length; i++) {
+                if (sloc1 + 1== tail[i][0] && sloc2 == tail[i][1]) {
+                    return 1;
+                }
+            }
+
             table[sloc1 + 1][sloc2] = SNAKE_HEAD;
-            table[sloc1][sloc2] = TEXTURE;
+            // draw tail
+            if (grow == 1) {
+                table[sloc1][sloc2] = SNAKE_BOD;
+                tail[length][0] = sloc1;
+                tail[length][1] = sloc2;
+                grow = 0;
+                length++;
+            } else if (length > 0) {
+                int tmp[4] = {sloc1, sloc2};
+                for (int i = 0; i < length; i++) {
+                    tmp[2] = tail[length - i][0];
+                    tmp[3] = tail[length - i][1];
+
+                    tail[length - i][0] = tmp[0];
+                    tail[length - i][1] = tmp[1];
+
+                    tmp[0] = tmp[2];
+                    tmp[1] = tmp[3];
+
+                    table[tail[length - i][0]][tail[length - i][1]] = SNAKE_BOD;
+                }
+            } else {
+                table[sloc1][sloc2] = TEXTURE;
+            }
             sloc1++;
         }
 
@@ -148,14 +245,46 @@ int draw(char key) {
             if (sloc2 + 1 > WIDTH - 1) {
                 return 1;
             }
+
+            // commit death if touching tail
+            for (int i = 0; i < length; i++) {
+                if (sloc1== tail[i][0] && sloc2 + 1 == tail[i][1]) {
+                    return 1;
+                }
+            }
+
             table[sloc1][sloc2 + 1] = SNAKE_HEAD;
-            table[sloc1][sloc2] = TEXTURE;
+            // draw tail
+            if (grow == 1) {
+                table[sloc1][sloc2] = SNAKE_BOD;
+                tail[length][0] = sloc1;
+                tail[length][1] = sloc2;
+                grow = 0;
+                length++;
+            } else if (length > 0) {
+                int tmp[4] = {sloc1, sloc2};
+                for (int i = 0; i < length; i++) {
+                    tmp[2] = tail[length - i][0];
+                    tmp[3] = tail[length - i][1];
+
+                    tail[length - i][0] = tmp[0];
+                    tail[length - i][1] = tmp[1];
+
+                    tmp[0] = tmp[2];
+                    tmp[1] = tmp[3];
+
+                    table[tail[length - i][0]][tail[length - i][1]] = SNAKE_BOD;
+                }
+            } else {
+                table[sloc1][sloc2] = TEXTURE;
+            }
             sloc2++;
         }
 
         if (sloc1 == rn1 && sloc2 == rn2) {
             score++;
-            length++;
+            // prepare for growth
+            grow = 1;
             // spawn flesh at a different location
             isflesh = 0;
             xrand();
@@ -194,6 +323,11 @@ int draw(char key) {
     printf("score = %i\n", score);
     printf("Press W, A, S, D for movement.\n");
     printf("Press Q to quit the game.\n");
+
+    for (int i = 0; i < HEIGHT; i++) {
+        free(table[i]);
+    }
+    free(table);
 }
 
 int input(void) {
@@ -226,7 +360,6 @@ void disableRawMode(void) {
 
 // generate two numbers between 0 ~ 20
 void xrand(void) {
-    srand(time(NULL));
     if (isflesh == 0) {
         rn1 = rand() % 20;
         rn2 = rand() % 20;
