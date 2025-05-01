@@ -303,6 +303,7 @@ int draw(char key) {
         // make sure rn1 and r2 are not in the center at the start of the game
         while (rn1 == WIDTH / 2 && rn2 == HEIGHT / 2) {
             // draw the flesh at a random location
+            isflesh = 0;
             xrand();
         }
         table[rn1][rn2] = FLESH;
