@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
@@ -27,6 +26,9 @@ int rn2;
 // snake location
 int sloc1;
 int sloc2;
+
+// snake length
+int length = 0;
 
 // has the game been started
 int isgame = 0;
@@ -63,28 +65,30 @@ int main(void) {
                     kkey = key;
                     break;
             }
-            if (kkey != ' ') {
-                isgame = 1;
-                switch (kkey) {
-                    case 'w':
-                        move = 1;
-                        break;
-                    case 'a':
-                        move = 2;
-                        break;
-                    case 's':
-                        move = 3;
-                        break;
-                    case 'd':
-                        move = 4;
-                }
-                if (draw(kkey) == 1) {
-                    printf("game over\n");
-                    return 1;
-                }
-            }
+
         }
-        usleep(10000);
+        if (kkey != ' ') {
+            isgame = 1;
+            switch (kkey) {
+                case 'w':
+                    move = 1;
+                    break;
+                case 'a':
+                    move = 2;
+                    break;
+                case 's':
+                    move = 3;
+                    break;
+                case 'd':
+                    move = 4;
+            }
+            if (draw(kkey) == 1) {
+                printf("game over\n");
+                printf("final score: %i\n", score);
+                return 1;
+            }
+            usleep(150000);
+        }
     }
 }
 
@@ -94,6 +98,7 @@ int draw(char key) {
     usleep(10000);
     printf("\e[1;1H\e[2J");
 
+    // create 2d array of the table
     int bufferSize = (HEIGHT * WIDTH) + WIDTH + 1;
     char*** table = malloc(HEIGHT * sizeof(char**));
     if (table == NULL) {
@@ -150,12 +155,14 @@ int draw(char key) {
 
         if (sloc1 == rn1 && sloc2 == rn2) {
             score++;
+            length++;
             // spawn flesh at a different location
             isflesh = 0;
             xrand();
         }
         table[rn1][rn2] = FLESH;
     }
+
     // if the game just started, draw the snake in the middle and spawn flesh
     if (!isgame) {
         table[HEIGHT / 2][WIDTH / 2] = SNAKE_HEAD;
@@ -172,6 +179,7 @@ int draw(char key) {
         table[rn1][rn2] = FLESH;
     }
 
+    // print table
     for (int i = 0; i < HEIGHT; i++) {
         for (int j = 0; j < WIDTH; j++) {
             printf("%s", table[i][j]);
