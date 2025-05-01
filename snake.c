@@ -31,7 +31,7 @@ int sloc2;
 // has the game been started
 int isgame = 0;
 
-void draw(char key);
+int draw(char key);
 void enableRawMode(void);
 void disableRawMode(void);
 int input(void);
@@ -78,14 +78,17 @@ int main(void) {
                     case 'd':
                         move = 4;
                 }
-                draw(kkey);
+                if (draw(kkey) == 1) {
+                    printf("game over\n");
+                    return 1;
+                }
             }
         }
         usleep(10000);
     }
 }
 
-void draw(char key) {
+int draw(char key) {
     // clear terminal before re-printing the table
     fflush(stdout);
     usleep(10000);
@@ -94,7 +97,7 @@ void draw(char key) {
     int bufferSize = (HEIGHT * WIDTH) + WIDTH + 1;
     char*** table = malloc(HEIGHT * sizeof(char**));
     if (table == NULL) {
-        return;
+        return 2;
     }
 
     for (int i = 0; i < HEIGHT; i++) {
@@ -108,24 +111,38 @@ void draw(char key) {
     // if a key is pressed
     if (key != ' ') {
         if (move == 1) {
+            // commit death if going out of bounds
+            if (sloc1 - 1 < 0) {
+                return 1;
+            }
+
             table[sloc1 - 1][sloc2] = SNAKE_HEAD;
             table[sloc1][sloc2] = TEXTURE;
             sloc1--;
         }
 
         else if (move == 2) {
+            if (sloc2 - 1 < 0) {
+                return 1;
+            }
             table[sloc1][sloc2 - 1] = SNAKE_HEAD;
             table[sloc1][sloc2] = TEXTURE;
             sloc2--;
         }
 
         else if (move == 3) {
+            if (sloc1 + 1 > HEIGHT - 1) {
+                return 1;
+            }
             table[sloc1 + 1][sloc2] = SNAKE_HEAD;
             table[sloc1][sloc2] = TEXTURE;
             sloc1++;
         }
 
         else if (move == 4) {
+            if (sloc2 + 1 > WIDTH - 1) {
+                return 1;
+            }
             table[sloc1][sloc2 + 1] = SNAKE_HEAD;
             table[sloc1][sloc2] = TEXTURE;
             sloc2++;
