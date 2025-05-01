@@ -1,13 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
 
-#define WIDTH 20
 #define HEIGHT 20
+#define WIDTH 20
 #define TEXTURE ". "
 #define FLESH "* "
+#define SNAKE_HEAD "O "
+#define SNAKE_BOD "o "
 
 int score = 0;
 
@@ -37,31 +40,45 @@ void xrand(void);
 
 int main(void) {
     char key = ' ';
+    char kkey = ' ';
     enableRawMode();
     xrand();
     draw(key);
     while (1) {
         if (input()) {
+            // set kkey to any valid movment key
             key = getch();
             if (key == 'q') break;
-
             switch (key) {
                 case 'w':
-                    draw(key);
-                    move = 1;
+                    kkey = key;
                     break;
                 case 'a':
-                    draw(key);
-                    move = 2;
+                    kkey = key;
                     break;
                 case 's':
-                    draw(key);
-                    move = 3;
+                    kkey = key;
                     break;
                 case 'd':
-                    draw(key);
-                    move = 4;
+                    kkey = key;
                     break;
+            }
+            if (kkey != ' ') {
+                isgame = 1;
+                switch (kkey) {
+                    case 'w':
+                        move = 1;
+                        break;
+                    case 'a':
+                        move = 2;
+                        break;
+                    case 's':
+                        move = 3;
+                        break;
+                    case 'd':
+                        move = 4;
+                }
+                draw(kkey);
             }
         }
         usleep(10000);
@@ -74,34 +91,72 @@ void draw(char key) {
     usleep(10000);
     printf("\e[1;1H\e[2J");
 
-    int bufferSize = (WIDTH * HEIGHT) + HEIGHT + 1;
-    char*** table = malloc(WIDTH * sizeof(char**));
+    int bufferSize = (HEIGHT * WIDTH) + WIDTH + 1;
+    char*** table = malloc(HEIGHT * sizeof(char**));
     if (table == NULL) {
         return;
     }
 
-    for (int i = 0; i < WIDTH; i++) {
-        table[i] = malloc(HEIGHT * sizeof(char*));
-        for (int j = 0; j < HEIGHT; j++) {
+    for (int i = 0; i < HEIGHT; i++) {
+        table[i] = malloc(WIDTH * sizeof(char*));
+        for (int j = 0; j < WIDTH; j++) {
             table[i][j] = TEXTURE;
         }
     }
 
-    // makse sure rn1 and r2 are not in the center
-    if (rn1 == HEIGHT / 2 && rn2 == WIDTH / 2) {
+    // make sure rn1 and r2 are not in the center at the start of the game
+    if (rn1 == WIDTH / 2 && rn2 == HEIGHT / 2 && isgame == 0) {
         xrand();
     }
     // draw the flesh at a random location
     table[rn1][rn2] = FLESH;
 
     // draw snake
+    // if a key is pressed
+    if (key != ' ') {
+        if (move == 1) {
+            table[sloc1 - 1][sloc2] = SNAKE_HEAD;
+            table[sloc1][sloc2] = TEXTURE;
+            sloc1--;
+        }
+
+        else if (move == 2) {
+            table[sloc1][sloc2 - 1] = SNAKE_HEAD;
+            table[sloc1][sloc2] = TEXTURE;
+            sloc2--;
+        }
+
+        else if (move == 3) {
+            table[sloc1 + 1][sloc2] = SNAKE_HEAD;
+            table[sloc1][sloc2] = TEXTURE;
+            sloc1++;
+        }
+
+        else if (move == 4) {
+            table[sloc1][sloc2 + 1] = SNAKE_HEAD;
+            table[sloc1][sloc2] = TEXTURE;
+            sloc2++;
+        }
+
+        if (strcmp(table[sloc1][sloc2], FLESH) == 0) {
+            score++;
+            // spawn flesh at a different location
+            table[rn1][rn2] = TEXTURE;
+            xrand();
+            table[rn1][rn2] = FLESH;
+        }
+    }
     // if the game just started, draw the snake in the middle
-    if (isgame == 0) {
-        table[WIDTH / 2][HEIGHT / 2] = "O";
+    if (!isgame) {
+        table[HEIGHT / 2][WIDTH / 2] = SNAKE_HEAD;
+
+        // set snake loc variable
+        sloc1 = HEIGHT / 2;
+        sloc2 = WIDTH / 2;
     }
 
-    for (int i = 0; i < WIDTH; i++) {
-        for (int j = 0; j < HEIGHT; j++) {
+    for (int i = 0; i < HEIGHT; i++) {
+        for (int j = 0; j < WIDTH; j++) {
             printf("%s", table[i][j]);
         }
         if (i == 5 && key != ' ') {
