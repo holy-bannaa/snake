@@ -38,8 +38,6 @@ char keys[4] = {'w', 'a', 's', 'd'};
 char key;
 // store curent movement key
 char mkey = ' ';
-// store old key
-char okey;
 
 // array for storing the random flesh locatins
 int rn[2];
