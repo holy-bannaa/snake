@@ -1,5 +1,5 @@
 # Snake
-#### Video Demo:  <https://youtue/8YexnGIJKvI?si=XfA1ztmDjsaA6aCP>
+#### Video Demo:  <https://youtu.be/8YexnGIJKvI?si=-a82yAdYe_9X1fkd>
 
 ## Description:
 
