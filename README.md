@@ -36,47 +36,35 @@ The arguments function checks for command line arguments and responds accordingl
 
 
 The RawMode functions disable and enable immediate access to keyboard input,  
-
 allowing the player to move using WASD. 
   
 
 The srand function sets all future rand functions to use the current time as  
-
 the seed for randomness. 
   
 
 The rand function sets the spawn location of the flesh to a random locations  
-
 as long as the player is not taking up that space.  
   
 
 The move function sets variables to the location of the snake head and  
-
 its tail, as dictated by the direction of movement. 
-
 If the head of the snake overlaps with the location of the flesh, then the  
-
 move function will frow the snake. 
   
 
 The populate function populates a 2d array that represents the game board,  
-
 taking into account the changes made by the move function. 
 
 It populates the array with numbers that represent each of the possible  
-
 chars: snake head, snake tail, flesh and the board color. 
 
 At the start of the game, the snake will be placed in the middle of the board  
-
 and the tail will be placed downwards. 
 
 If the game has already started, the whole board is reset by setting all the values in the array to 1. 
-
 Then a 3 is placed at the coordinates where the snake head is as dictated my move. 
-
 After that, a loop places a 4 at every location where the tail should be. 
-
 Lastly, flesh is placed by setting the random spot to 2. 
 
 The draw function then prints the 2d array using a loop the follows these rules:
