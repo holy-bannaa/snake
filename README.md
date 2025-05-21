@@ -1,8 +1,9 @@
 # Snake
 #### Video Demo:  <https://youtu.be/8YexnGIJKvI?si=XfA1ztmDjsaA6aCP>
-#### Description:
 
-## Written in C
+## Description:
+
+### Written in C
 
 The game is written in C, because I really liked C during the CS50 course.
 
@@ -23,7 +24,7 @@ The game is written in C, because I really liked C during the CS50 course.
 * The location of the snake's tail, stored as an array
 * The array storing the game board
 
-### the functions
+### The functions
 
 The RawMode functions disable and enable immediate access to keyboard input
 
